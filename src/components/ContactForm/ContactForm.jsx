@@ -1,49 +1,48 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useSelector } from 'react-redux';
-import { addContact } from 'redux/contactSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from 'redux/operations';
 import { Box, Button, Form, Label, Text } from './ContactForm.styled';
 
 const ContactForm = () => {
-  const contacts = useSelector(state => state.contacts.contacts);
+  const items = useSelector(state => state.contacts.items);
   const dispatch = useDispatch();
 
-  const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
+  const [state, setState] = useState({
+    name: '',
+    phone: '',
+  });
+
+  function handleChange(evt) {
+    const value = evt.target.value;
+    setState({
+      ...state,
+      [evt.target.name]: value,
+    });
+  }
 
   const handleSubmit = e => {
     e.preventDefault();
     let savedName = false;
 
-    contacts.forEach(element => {
-      if (element.name.toLowerCase() === name.toLowerCase()) {
-        alert(`${name} is already in contacts`);
+    items.forEach(element => {
+      if (element.name.toLowerCase() === state.name.toLowerCase()) {
+        alert(`${state.name} is already in contacts`);
         savedName = true;
-        setName('');
-        setNumber('');
+        setState({
+          name: '',
+          phone: '',
+        });
       }
     });
     if (savedName) {
       return;
     }
 
-    dispatch(addContact({ name, number }));
-    setName('');
-    setNumber('');
-  };
-
-  const handleChange = e => {
-    const prop = e.currentTarget.name;
-    switch (prop) {
-      case 'name':
-        setName(e.currentTarget.value);
-        break;
-      case 'number':
-        setNumber(e.currentTarget.value);
-        break;
-      default:
-        throw new Error('Error');
-    }
+    dispatch(addContact(state));
+    setState({
+      name: '',
+      phone: '',
+    });
   };
 
   return (
@@ -53,7 +52,7 @@ const ContactForm = () => {
           <Label>
             <Text>Name</Text>
             <input
-              value={name}
+              value={state.name}
               onChange={handleChange}
               type="text"
               name="name"
@@ -65,18 +64,16 @@ const ContactForm = () => {
           <Label>
             <Text>Number</Text>
             <input
-              value={number}
+              value={state.phone}
               onChange={handleChange}
-              type="tel"
-              name="number"
+              type="text"
+              name="phone"
               pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
               title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
               required
             />
           </Label>
-          <Button type="submit">
-            Add contact
-          </Button>
+          <Button type="submit">Add contact</Button>
         </Form>
       </Box>
     </>

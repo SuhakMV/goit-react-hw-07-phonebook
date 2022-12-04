@@ -1,0 +1,6 @@
+.loader_spinner {
+    position: absolute;
+    position: fixed;
+    left: calc(50% - 48px);
+    top: 20%;
+}
